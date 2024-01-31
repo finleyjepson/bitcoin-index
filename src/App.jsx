@@ -1,5 +1,5 @@
 import "./App.css"
-import BitcoinIndex from "./BitcoinIndex"
+import BitcoinIndex from "./components/BitcoinIndex"
 import Bitcoin from "./assets/bitcoin-btc-logo.png"
 
 function App() {
