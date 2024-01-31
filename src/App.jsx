@@ -1,5 +1,6 @@
 import "./App.css"
-import BitcoinIndex from "./BitcoinIndex"
+// import BitcoinIndex from "./BitcoinIndex"
+import BitcoinIndexV2 from "./BitcoinIndexV2.jsx"
 import Bitcoin from "./assets/bitcoin-btc-logo.png"
 
 function App() {
@@ -9,7 +10,7 @@ function App() {
                 <img src={Bitcoin} alt='Bitcoin Logo' className='logo' />
                 <h1>Bitcoin Price</h1>
             </div>
-            <BitcoinIndex />
+            <BitcoinIndexV2 />
         </>
     )
 }
