@@ -1,27 +1,32 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
+import CurrencySelector from "./CurrencySelector"
+
+async function UseFetchPrice(currency, setPrice, updatePrice, updateCurrency, setUpdatePrice, setUpdateCurrency, setFetchedCurrency) {
+    if (!updatePrice && !updateCurrency) return
+
+    await fetch(`https://api.coindesk.com/v1/bpi/currentprice/${currency}.json`)
+        .then((res) => res.json())
+        .then((data) => {
+            sessionStorage.setItem("price", data.bpi[currency.toUpperCase()].rate)
+            sessionStorage.setItem("currency", currency)
+            sessionStorage.setItem("fetchedCurrency", currency)
+            setPrice(data.bpi[currency.toUpperCase()].rate)
+            setFetchedCurrency(currency)
+        })
+    console.log("Price updated")
+    setUpdatePrice(false)
+    setUpdateCurrency(false)
+}
 
 function BitcoinIndex() {
-    let [price, setPrice] = useState(localStorage.getItem('price') || 0) // the price of bitcoin fetched from the API
-    let [updatePrice, setUpdatePrice] = useState(true) // whether to update the price
-    let [currency, setCurrency] = useState(localStorage.getItem('currency') || 'aud') // the currency selected
-	let [fetchedCurrency, setFetchedCurrency] = useState(localStorage.getItem('fetchedCurrency') || 'aud') // used to display the currency when the price is fetched
-    let [updateCurrency, setUpdateCurrency] = useState(false) // used to trigger useEffect when a new currency is selected
+    const [price, setPrice] = useState(sessionStorage.getItem("price") || 'Loading...') // the price of bitcoin fetched from the API
+    const [updatePrice, setUpdatePrice] = useState(true) // whether to update the price
+    const [currency, setCurrency] = useState(sessionStorage.getItem("currency") || "aud") // the currency selected
+    const [fetchedCurrency, setFetchedCurrency] = useState(sessionStorage.getItem("fetchedCurrency") || "aud") // used to display the currency when the price is fetched
+    const [updateCurrency, setUpdateCurrency] = useState(false) // used to trigger useEffect when a new currency is selected
 
     useEffect(() => {
-        if (!updatePrice && !updateCurrency) return
-
-        fetch(`https://api.coindesk.com/v1/bpi/currentprice/${currency}.json`)
-            .then((res) => res.json())
-            .then((data) =>{
-				localStorage.setItem('price', data.bpi[currency.toUpperCase()].rate)
-                localStorage.setItem('currency', currency)
-                localStorage.setItem('fetchedCurrency', currency)
-                setPrice(data.bpi[currency.toUpperCase()].rate)
-				setFetchedCurrency(currency)
-			})
-        console.log("Price updated")
-        setUpdatePrice(false)
-        setUpdateCurrency(false)
+        UseFetchPrice(currency, setPrice, updatePrice, updateCurrency, setUpdatePrice, setUpdateCurrency, setFetchedCurrency)
     }, [updatePrice, updateCurrency, currency])
 
     const handleCurrencyChange = (e) => {
@@ -31,15 +36,9 @@ function BitcoinIndex() {
 
     return (
         <>
-            <select value={localStorage.getItem('currency') || 'aud'} className="drop-down" onChange={handleCurrencyChange}>
-                <option value='aud'>AUD</option>
-                <option value='usd'>USD</option>
-                <option value='eur'>EUR</option>
-            </select>
-            <p>Current Price: {price + ` ${fetchedCurrency.toUpperCase()}`}</p>
-            <button onClick={() => setUpdatePrice((prevState) => !prevState)}>
-                Update Price
-            </button>
+            <CurrencySelector currency={currency} onCurrencyChange={handleCurrencyChange} />
+            <p>The current price is: {price + ` ${fetchedCurrency.toUpperCase()}`}</p>
+            <button onClick={() => setUpdatePrice((prevState) => !prevState)}>Update Price</button>
         </>
     )
 }
